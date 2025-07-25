@@ -1,3 +1,4 @@
+// 确保导入使用相对路径或绝对URL
 import * as THREE from 'three';
 import { TilesRenderer } from '3d-tiles-renderer';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';

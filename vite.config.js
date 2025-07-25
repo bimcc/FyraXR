@@ -18,17 +18,18 @@ export default defineConfig(({ command, mode }) => {
           assetFileNames: 'assets/[name]-[hash].[ext]'
         }
       },
+      // 拷贝public文件夹内容到dist根目录
+      copyPublicDir: true,
       // 添加这个配置来确保相对路径
       cssCodeSplit: false
     },
-    // 确保开发和生产环境的一致性
+    // 确保生成的HTML文件使用相对路径
     experimental: {
       renderBuiltUrl(filename, { hostType }) {
-        if (hostType === 'js') {
-          return { js: `'./${filename}'` }
-        } else {
-          return { relative: true }
+        if (hostType === 'js' || hostType === 'html') {
+          return { relative: true };
         }
+        return { relative: true };
       }
     }
   }

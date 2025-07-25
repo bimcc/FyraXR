@@ -6,9 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node fix-paths.cjs",
     "preview": "vite preview",
-    "serve": "http-server . -p 8080 -c-1"
+    "serve": "http-server . -p 8080 -c-1",
+    "fix-paths": "node fix-paths.cjs",
+    "deploy": "bash deploy.sh"
   },
   "dependencies": {
     "3d-tiles-renderer": "^0.4.12",
