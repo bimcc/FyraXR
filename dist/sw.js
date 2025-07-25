@@ -2,11 +2,11 @@ const CACHE_NAME = 'fyraxr-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/assets/main-BNBVKrJr.js',  // ✅ 正确的构建文件路径
-  '/assets/sw-6sQpYQrK.js',   // ✅ 正确的构建文件路径
-  '/icon/icon.png',           // ✅ 正确的图标路径
-  '/models/mj/'               // ✅ 模型文件夹
+  '/src/main.js',
+  '/src/ar/ARManager.js',
+  '/src/tiles/TilesManager.js',
+  '/src/calibration/CalibrationManager.js',
+  '/src/ui/UIController.js'
 ];
 
 self.addEventListener('install', event => {

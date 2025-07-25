@@ -1,1 +1,0 @@
-const s="fyraxr-v1",t=["/","/index.html","/src/main.js","/src/ar/ARManager.js","/src/tiles/TilesManager.js","/src/calibration/CalibrationManager.js","/src/ui/UIController.js"];self.addEventListener("install",r=>{r.waitUntil(caches.open(s).then(e=>e.addAll(t)))});self.addEventListener("fetch",r=>{r.respondWith(caches.match(r.request).then(e=>e||fetch(r.request)))});
