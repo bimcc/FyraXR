@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="FyraXR">
     
-    <!-- Icons - 修改为相对路径，指向实际存在的图标 -->
+    <!-- Icons -->
     <link rel="apple-touch-icon" href="./icon/icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="./icon/icon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./icon/icon.png">
@@ -83,46 +83,26 @@
     </div>
     
     <script>
-        // 修复Service Worker注册 - 使用相对路径
+        // Service Worker注册
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
                     const registrations = await navigator.serviceWorker.getRegistrations();
                     console.log('Current SW registrations:', registrations);
                     
-                    // 使用相对路径注册Service Worker
                     const registration = await navigator.serviceWorker.register('./sw.js', {
                         scope: './'
                     });
                     
                     console.log('✅ SW registered successfully:', registration);
-                    console.log('SW scope:', registration.scope);
-                    console.log('SW state:', registration.installing || registration.waiting || registration.active);
-                    
-                    registration.addEventListener('updatefound', () => {
-                        console.log('🔄 SW update found');
-                    });
-                    
-                    if (registration.active) {
-                        console.log('✅ SW is active and running');
-                    } else {
-                        console.log('⏳ SW is installing/waiting');
-                    }
                     
                 } catch (error) {
                     console.error('❌ SW registration failed:', error);
-                    console.error('Error details:', {
-                        message: error.message,
-                        stack: error.stack,
-                        currentURL: window.location.href
-                    });
                 }
             });
-        } else {
-            console.log('❌ Service Worker not supported in this browser');
         }
     </script>
     
-    <!-- 修改为相对路径 -->
+    <!-- 关键：确保这行存在 -->
 </body>
 </html>
