@@ -6,7 +6,7 @@
     <title>FyraXR</title>
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="./manifest.json">
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#000000">
@@ -14,10 +14,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="FyraXR">
     
-    <!-- Icons -->
-    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <!-- Icons - 修改为相对路径，指向实际存在的图标 -->
+    <link rel="apple-touch-icon" href="./icon/icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icon/icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./icon/icon.png">
 </head>
 <body>
     <div id="container">
@@ -82,29 +82,26 @@
     </div>
     
     <script>
-        // 增强的Service Worker注册和调试
+        // 修复Service Worker注册 - 使用相对路径
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    // 检查当前注册状态
                     const registrations = await navigator.serviceWorker.getRegistrations();
                     console.log('Current SW registrations:', registrations);
                     
-                    // 注册新的Service Worker
-                    const registration = await navigator.serviceWorker.register('/sw.js', {
-                        scope: '/'
+                    // 使用相对路径注册Service Worker
+                    const registration = await navigator.serviceWorker.register('./sw.js', {
+                        scope: './'
                     });
                     
                     console.log('✅ SW registered successfully:', registration);
                     console.log('SW scope:', registration.scope);
                     console.log('SW state:', registration.installing || registration.waiting || registration.active);
                     
-                    // 监听Service Worker状态变化
                     registration.addEventListener('updatefound', () => {
                         console.log('🔄 SW update found');
                     });
                     
-                    // 检查Service Worker是否激活
                     if (registration.active) {
                         console.log('✅ SW is active and running');
                     } else {
@@ -125,6 +122,7 @@
         }
     </script>
     
-    <script type="module" src="/src/main.js"></script>
+    <!-- 修改为相对路径 -->
+    <script type="module" src="./src/main.js"></script>
 </body>
 </html>
