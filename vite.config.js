@@ -9,15 +9,25 @@ export default defineConfig(({ command, mode }) => {
     base,
     build: {
       outDir: 'dist',
-      // 确保资源路径正确
       assetsDir: 'assets',
-      // 生成相对路径
+      // 关键：确保生成相对路径
       rollupOptions: {
         output: {
-          // 确保chunk文件名不包含绝对路径
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash].[ext]'
+        }
+      },
+      // 添加这个配置来确保相对路径
+      cssCodeSplit: false
+    },
+    // 确保开发和生产环境的一致性
+    experimental: {
+      renderBuiltUrl(filename, { hostType }) {
+        if (hostType === 'js') {
+          return { js: `'./${filename}'` }
+        } else {
+          return { relative: true }
         }
       }
     }
