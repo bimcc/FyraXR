@@ -111,12 +111,22 @@ class FyraXRApp {
     }
     
     async loadDefaultTileset() {
+        // 获取基础路径
+        const basePath = window.location.pathname.includes('/FyraXR/') 
+            ? '/FyraXR' 
+            : '';
+        
+        console.log('🌐 Tileset加载基础路径:', basePath);
+        
         // 修正路径指向正确的mj模型位置
         const tilesetUrls = [
-            // 本地mj模型数据
+            // 基于当前环境的模型数据
+            `${basePath}/models/mj/tileset.json`,
+            
+            // 相对路径尝试
             './models/mj/tileset.json',
             
-            // 备用路径（如果上面的路径不工作）
+            // 备用绝对路径
             '/models/mj/tileset.json',
             
             // Cesium Ion示例数据（需要访问令牌）

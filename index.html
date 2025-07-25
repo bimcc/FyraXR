@@ -89,6 +89,13 @@
                     const registrations = await navigator.serviceWorker.getRegistrations();
                     console.log('Current SW registrations:', registrations);
                     
+                    // 获取当前基础路径
+                    const basePath = window.location.pathname.includes('/FyraXR/') 
+                        ? '/FyraXR/' 
+                        : '/';
+                    
+                    console.log('🌐 当前基础路径:', basePath);
+                    
                     const registration = await navigator.serviceWorker.register('./sw.js', {
                         scope: './'
                     });
