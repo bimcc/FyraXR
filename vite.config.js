@@ -61,13 +61,31 @@ export default defineConfig(({ command, mode }) => {
           manualChunks: {
             three: ['three', 'three/examples/jsm/controls/OrbitControls.js'],
             '3d-tiles': ['3d-tiles-renderer']
-          }
+          },
+          // 确保外部模块正确导入
+          format: 'es',
+          inlineDynamicImports: false
+        }
+      },
+      // 确保生成正确的模块格式
+      target: 'es2015',
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: false
         }
       },
       cssCodeSplit: false
     },
     optimizeDeps: {
       include: ['three', '3d-tiles-renderer']
+    },
+    resolve: {
+      // 确保模块可以在GitHub Pages环境下解析
+      alias: {
+        'three': resolve(__dirname, 'node_modules/three'),
+        '3d-tiles-renderer': resolve(__dirname, 'node_modules/3d-tiles-renderer')
+      }
     },
     plugins: [
       copyFilesAfterBuild()

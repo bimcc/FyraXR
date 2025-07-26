@@ -1,4 +1,4 @@
-// 使用别名方式导入，让Vite处理具体路径解析
+// 动态导入确保在所有环境中都能正确工作
 import * as THREE from 'three';
 import { TilesRenderer } from '3d-tiles-renderer';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -7,6 +7,12 @@ import { CalibrationManager } from './calibration/CalibrationManager.js';
 import { UIController } from './ui/uicontroller.js';
 import { TilesManager } from './tiles/TilesManager.js';
 
+// 添加模块路径解析适配
+if (window.THREE === undefined) {
+    window.THREE = THREE;
+}
+
+// 类定义和应用逻辑
 class FyraXRApp {
     constructor() {
         this.scene = null;
