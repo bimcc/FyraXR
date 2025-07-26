@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fyraxr-v5'; // 更新版本号
+const CACHE_NAME = 'fyraxr-v6'; // 更新版本号
 
 // 获取当前作用域的基础路径
 const getBasePath = () => {
@@ -13,25 +13,22 @@ self.addEventListener('install', event => {
   const base = getBasePath();
   console.log('Service Worker 基础路径:', base);
   
-  // 只缓存静态资源，不缓存HTML
+  // 只缓存基础静态资源，不使用通配符
   const urlsToCache = [
     base + 'manifest.json',
-    base + 'icon/icon.png',
-    // 添加构建后的资源文件 - 使用通配符模式
-    base + 'assets/index-*.js',
-    base + 'assets/three-*.js',
-    base + 'assets/3d-tiles-*.js'
-    // 移除index.html，让它始终从网络获取
+    base + 'icon/icon.png'
+    // 不再使用通配符，在fetch事件中缓存JS资源
   ];
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('缓存文件列表:', urlsToCache);
+        console.log('缓存基础文件:', urlsToCache);
         return cache.addAll(urlsToCache);
       })
       .catch(error => {
         console.error('缓存文件失败:', error);
+        // 错误时继续，不阻止SW安装
       })
   );
   
@@ -87,6 +84,7 @@ self.addEventListener('fetch', event => {
             
             // 更新缓存
             caches.open(CACHE_NAME).then(cache => {
+              console.log('缓存资源:', url.pathname);
               cache.put(event.request, responseToCache);
             });
             

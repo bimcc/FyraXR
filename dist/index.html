@@ -11,8 +11,19 @@
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="FyraXR">
+    
+    <!-- 添加模块导入映射 -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "./assets/three-CpL7CGyr.js",
+        "3d-tiles-renderer": "./assets/3d-tiles-CBwan3Gz.js"
+      }
+    }
+    </script>
     
     <!-- Icons -->
     <link rel="apple-touch-icon" href="./assets/icon-C0QQ1j6M.png">
@@ -58,6 +69,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px 8px 0 0;
             cursor: pointer;
+            -webkit-user-select: none;
             user-select: none;
         }
         
@@ -199,17 +211,17 @@
                 </div>
                 
                 <div class="control-group">
-                    <label>模型透明度:</label>
+                    <label for="opacity-slider">模型透明度:</label>
                     <div class="control-row">
-                        <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="0.8">
+                        <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="0.8" title="调整模型透明度">
                         <span class="value-display" id="opacity-value">0.8</span>
                     </div>
                 </div>
                 
                 <div class="control-group">
-                    <label>缩放:</label>
+                    <label for="scale-slider">缩放:</label>
                     <div class="control-row">
-                        <input type="range" id="scale-slider" min="0.1" max="2" step="0.1" value="1">
+                        <input type="range" id="scale-slider" min="0.1" max="2" step="0.1" value="1" title="调整模型缩放">
                         <span class="value-display" id="scale-value">1.0</span>
                     </div>
                 </div>
