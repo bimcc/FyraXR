@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fyraxr-v2';
+const CACHE_NAME = 'fyraxr-v4'; // 更新版本号
 
 // 获取当前作用域的基础路径
 const getBasePath = () => {
@@ -13,13 +13,11 @@ self.addEventListener('install', event => {
   const base = getBasePath();
   console.log('Service Worker 基础路径:', base);
   
-  // 要缓存的URL列表
+  // 只缓存静态资源，不缓存HTML
   const urlsToCache = [
-    base,
-    base + 'index.html',
-    base + 'assets/index-DqvpZU2w.js', // 确保这个名称与构建后的文件匹配
     base + 'manifest.json',
     base + 'icon/icon.png'
+    // 移除index.html，让它始终从网络获取
   ];
   
   event.waitUntil(
@@ -28,10 +26,50 @@ self.addEventListener('install', event => {
         console.log('缓存文件列表:', urlsToCache);
         return cache.addAll(urlsToCache);
       })
+      .catch(error => {
+        console.error('缓存文件失败:', error);
+      })
   );
+  
+  // 强制激活新的Service Worker
+  self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
+  // 只处理同源请求
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+  
+  const url = new URL(event.request.url);
+  
+  // 对HTML文件使用网络优先策略
+  if (url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // 网络请求成功，返回最新内容
+          if (response && response.status === 200) {
+            return response;
+          }
+          // 网络失败，尝试从缓存获取
+          return caches.match(event.request);
+        })
+        .catch(() => {
+          // 网络和缓存都失败，返回缓存或离线页面
+          return caches.match(event.request) || new Response('离线模式', {
+            status: 200,
+            statusText: 'OK',
+            headers: new Headers({
+              'Content-Type': 'text/html'
+            })
+          });
+        })
+    );
+    return;
+  }
+  
+  // 对其他资源使用缓存优先策略
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -59,7 +97,35 @@ self.addEventListener('fetch', event => {
               
             return response;
           }
-        );
+        ).catch(error => {
+          console.error('Fetch 失败:', error);
+          return new Response('离线模式', {
+            status: 200,
+            statusText: 'OK',
+            headers: new Headers({
+              'Content-Type': 'text/html'
+            })
+          });
+        });
       })
     );
+});
+
+// 清理旧缓存
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('删除旧缓存:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  
+  // 立即控制所有客户端
+  return self.clients.claim();
 });

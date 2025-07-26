@@ -1,0 +1,30 @@
+{
+  "name": "fyraxr-3dtiles-ar",
+  "version": "1.0.0",
+  "description": "WebXR AR application for 3D Tiles visualization with real-world alignment",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "http-server . -p 8080 -c-1"
+  },
+  "dependencies": {
+    "3d-tiles-renderer": "^0.4.12",
+    "three": "^0.166.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "http-server": "^14.1.1"
+  },
+  "keywords": [
+    "webxr",
+    "ar",
+    "3d-tiles",
+    "three.js",
+    "augmented-reality"
+  ],
+  "author": "FyraXR Team",
+  "license": "MIT"
+}
