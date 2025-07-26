@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fyraxr-v6'; // 更新版本号
+const CACHE_NAME = 'fyraxr-v7'; // 更新版本号，强制更新
 
 // 获取当前作用域的基础路径
 const getBasePath = () => {
@@ -13,23 +13,36 @@ self.addEventListener('install', event => {
   const base = getBasePath();
   console.log('Service Worker 基础路径:', base);
   
-  // 只缓存基础静态资源，不使用通配符
+  // 只缓存基础静态资源
   const urlsToCache = [
-    base + 'manifest.json',
-    base + 'icon/icon.png'
-    // 不再使用通配符，在fetch事件中缓存JS资源
+    `${base}`,
+    `${base}index.html`,
+    `${base}manifest.json`,
+    `${base}icon/icon.png`
   ];
   
+  // 添加更加健壮的缓存处理
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
+    (async () => {
+      try {
+        const cache = await caches.open(CACHE_NAME);
         console.log('缓存基础文件:', urlsToCache);
-        return cache.addAll(urlsToCache);
-      })
-      .catch(error => {
-        console.error('缓存文件失败:', error);
+        
+        // 单独逐个缓存文件，避免一个失败导致全部失败
+        for (const url of urlsToCache) {
+          try {
+            await cache.add(new Request(url, { cache: 'no-cache' }));
+            console.log(`✅ 成功缓存: ${url}`);
+          } catch (err) {
+            console.warn(`❌ 无法缓存: ${url}`, err);
+            // 继续处理下一个，不中断整个过程
+          }
+        }
+      } catch (error) {
+        console.error('缓存初始化失败:', error);
         // 错误时继续，不阻止SW安装
-      })
+      }
+    })()
   );
   
   // 强制激活新的Service Worker

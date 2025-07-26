@@ -7,9 +7,14 @@ import { CalibrationManager } from './calibration/CalibrationManager.js';
 import { UIController } from './ui/uicontroller.js';
 import { TilesManager } from './tiles/TilesManager.js';
 
-// 添加模块路径解析适配
+// 确保THREE在全局可用
 if (window.THREE === undefined) {
     window.THREE = THREE;
+}
+
+// 确保TilesRenderer在全局可用
+if (window.TilesRenderer === undefined) {
+    window.TilesRenderer = TilesRenderer;
 }
 
 // 类定义和应用逻辑

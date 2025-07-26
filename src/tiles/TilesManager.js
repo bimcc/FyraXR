@@ -25,8 +25,12 @@ export class TilesManager {
                     
                     if (response.ok) {
                         console.log(`✅ 资源可访问: ${resourceUrl}`);
+                        
+                        // 优先使用全局对象以支持GitHub Pages环境
+                        let TilesRendererClass = window.TilesRenderer || TilesRenderer;
+                        
                         // 创建TilesRenderer实例
-                        const tileRenderer = new TilesRenderer(resourceUrl);
+                        const tileRenderer = new TilesRendererClass(resourceUrl);
                         return tileRenderer;
                     } else {
                         console.warn(`❌ 资源不可访问 (${response.status}): ${resourceUrl}`);
@@ -45,6 +49,13 @@ export class TilesManager {
             if (!this.tilesRenderer) {
                 console.log('直接URL加载失败，尝试其他路径...');
                 
+                // 尝试各种可能的路径组合
+                const pathCombinations = [];
+                
+                // 检测GitHub Pages环境
+                const isGitHubPages = window.location.hostname.includes('github.io');
+                const repoName = isGitHubPages ? '/FyraXR' : '';
+                
                 // 获取基础路径
                 const basePath = window.location.pathname.includes('/FyraXR/') 
                     ? '/FyraXR/' 
@@ -61,6 +72,12 @@ export class TilesManager {
                     
                     // GitHub Pages特定路径
                     '/FyraXR/models/mj/tileset.json',
+                    
+                    // GitHub Pages根路径
+                    `${repoName}/models/mj/tileset.json`,
+                    
+                    // 完整URL
+                    `${window.location.origin}${repoName}/models/mj/tileset.json`,
                 ];
                 
                 // 尝试每一个备用路径

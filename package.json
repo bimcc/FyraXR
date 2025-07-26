@@ -17,6 +17,7 @@
   "devDependencies": {
     "fs-extra": "^11.3.0",
     "http-server": "^14.1.1",
+    "terser": "^5.43.1",
     "vite": "^5.0.0"
   },
   "keywords": [
