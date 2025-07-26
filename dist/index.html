@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FyraXR</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/FyraXR/assets/manifest-BvGC_D0a.json">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="FyraXR">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="/FyraXR/assets/icon-C0QQ1j6M.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/FyraXR/assets/icon-C0QQ1j6M.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/FyraXR/assets/icon-C0QQ1j6M.png">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        /* 浮动控制面板样式 */
+        .floating-control-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            min-width: 280px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .panel-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .collapse-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .collapse-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .panel-content {
+            padding: 16px;
+            max-height: 500px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .panel-content.collapsed {
+            max-height: 0;
+            padding: 0 16px;
+            overflow: hidden;
+        }
+        
+        .control-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        label {
+            font-size: 12px;
+            color: #ccc;
+            min-width: 80px;
+        }
+        
+        button {
+            background: #007acc;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #005a9e;
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            margin: 0 8px;
+        }
+        
+        .status {
+            font-size: 11px;
+            color: #aaa;
+            padding: 4px 0;
+        }
+        
+        .value-display {
+            min-width: 40px;
+            text-align: center;
+            font-size: 11px;
+            color: #fff;
+        }
+        
+        /* 标定面板样式 */
+        #calibration-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            padding: 20px;
+            z-index: 1001;
+            display: none;
+            min-width: 300px;
+        }
+        
+        #calibration-panel h4 {
+            margin: 0 0 16px 0;
+            text-align: center;
+        }
+    </style>
+  <script type="module" crossorigin src="/FyraXR/assets/index-Doi4hBpO.js"></script>
+</head>
+<body>
+    <div id="container">
+        <!-- 浮动控制面板 -->
+        <div class="floating-control-panel" id="control-panel">
+            <div class="panel-header" id="panel-header">
+                <div class="panel-title">FyraXR 控制面板</div>
+                <button class="collapse-btn" id="collapse-btn">−</button>
+            </div>
+            <div class="panel-content" id="panel-content">
+                <div class="control-group">
+                    <div class="control-row">
+                        <button id="ar-button">启动AR</button>
+                        <button id="calibrate-button" disabled>位置标定</button>
+                    </div>
+                    <div class="status" id="ar-status">AR未启动</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>模型透明度:</label>
+                    <div class="control-row">
+                        <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="0.8">
+                        <span class="value-display" id="opacity-value">0.8</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>缩放:</label>
+                    <div class="control-row">
+                        <input type="range" id="scale-slider" min="0.1" max="2" step="0.1" value="1">
+                        <span class="value-display" id="scale-value">1.0</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-row">
+                        <button id="reset-position">重置位置</button>
+                        <button id="save-calibration">保存标定</button>
+                    </div>
+                </div>
+                
+                <div class="status" id="tiles-status">正在加载3D Tiles...</div>
+            </div>
+        </div>
+        
+        <!-- 标定面板 -->
+        <div id="calibration-panel">
+            <h4>AR位置标定</h4>
+            <div class="calibration-controls">
+                <div class="control-group">
+                    <label>X偏移:</label>
+                    <div class="control-row">
+                        <input type="range" id="offset-x" min="-10" max="10" step="0.1" value="0">
+                        <span class="value-display" id="offset-x-value">0</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Y偏移:</label>
+                    <div class="control-row">
+                        <input type="range" id="offset-y" min="-10" max="10" step="0.1" value="0">
+                        <span class="value-display" id="offset-y-value">0</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Z偏移:</label>
+                    <div class="control-row">
+                        <input type="range" id="offset-z" min="-10" max="10" step="0.1" value="0">
+                        <span class="value-display" id="offset-z-value">0</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>旋转Y:</label>
+                    <div class="control-row">
+                        <input type="range" id="rotation-y" min="-180" max="180" step="1" value="0">
+                        <span class="value-display" id="rotation-y-value">0°</span>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <button id="apply-calibration">应用标定</button>
+                    <button id="close-calibration">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Service Worker注册
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    console.log('Current SW registrations:', registrations);
+                    
+                    // 获取当前基础路径
+                    const basePath = window.location.pathname.includes('/FyraXR/') 
+                        ? '/FyraXR/' 
+                        : '/';
+                    
+                    console.log('🌐 当前基础路径:', basePath);
+                    
+                    const registration = await navigator.serviceWorker.register('./sw.js', {
+                        scope: './'
+                    });
+                    
+                    console.log('✅ SW registered successfully:', registration);
+                    
+                } catch (error) {
+                    console.error('❌ SW registration failed:', error);
+                }
+            });
+        }
+    </script>
+    
+    <!-- 关键：确保这行存在 -->
+</body>
+</html>
