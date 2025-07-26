@@ -1,3 +1,4 @@
+// 使用别名方式导入，让Vite处理具体路径解析
 import * as THREE from 'three';
 import { TilesRenderer } from '3d-tiles-renderer';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -111,44 +112,26 @@ class FyraXRApp {
     }
     
     async loadDefaultTileset() {
-        // 获取基础路径
-        const basePath = window.location.pathname.includes('/FyraXR/') 
-            ? '/FyraXR' 
-            : '';
-        
-        console.log('🌐 Tileset加载基础路径:', basePath);
-        
-        // 修正路径指向正确的mj模型位置
-        const tilesetUrls = [
-            // 基于当前环境的模型数据
-            `${basePath}/models/mj/tileset.json`,
+        try {
+            // 获取基础路径
+            const basePath = window.location.pathname.includes('/FyraXR/') 
+                ? '/FyraXR' 
+                : '';
             
-            // 相对路径尝试
-            './models/mj/tileset.json',
+            console.log('🌐 Tileset加载基础路径:', basePath);
             
-            // 备用绝对路径
-            '/models/mj/tileset.json',
+            // 统一使用TilesManager的增强加载功能，让它处理路径尝试逻辑
+            await this.tilesManager.loadTileset(`${basePath}/models/mj/tileset.json`);
+            this.uiController.updateTilesStatus('3D Tiles加载完成');
+            console.log('3D Tiles模型加载成功!');
             
-            // Cesium Ion示例数据（需要访问令牌）
-            // 'https://assets.cesium.com/43978/tileset.json',
-        ];
-        
-        for (const url of tilesetUrls) {
-            try {
-                console.log(`尝试加载tileset: ${url}`);
-                await this.tilesManager.loadTileset(url);
-                this.uiController.updateTilesStatus(`3D Tiles加载完成: ${url}`);
-                console.log('3D Tiles模型加载成功!');
-                return;
-            } catch (error) {
-                console.warn(`Tileset ${url} 加载失败:`, error);
-            }
+            return;
+        } catch (error) {
+            console.warn('所有tileset加载尝试失败:', error);
+            // 创建示例几何体作为备选方案
+            this.createExampleGeometry();
+            this.uiController.updateTilesStatus('使用示例几何体 (模型加载失败)');
         }
-        
-        // 如果所有URL都失败，使用示例几何体
-        console.warn('所有tileset加载失败，使用示例几何体');
-        this.createExampleGeometry();
-        this.uiController.updateTilesStatus('使用示例几何体');
     }
     
     createExampleGeometry() {

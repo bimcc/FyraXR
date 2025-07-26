@@ -15,8 +15,68 @@ export class TilesManager {
         console.log('开始加载tileset:', url);
         
         try {
-            // 创建TilesRenderer实例
-            this.tilesRenderer = new TilesRenderer(url);
+            // 创建带错误处理的资源加载器
+            const loadWithErrorHandling = async (resourceUrl) => {
+                try {
+                    const response = await fetch(resourceUrl, { 
+                        method: 'HEAD',
+                        cache: 'no-cache' 
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`✅ 资源可访问: ${resourceUrl}`);
+                        // 创建TilesRenderer实例
+                        const tileRenderer = new TilesRenderer(resourceUrl);
+                        return tileRenderer;
+                    } else {
+                        console.warn(`❌ 资源不可访问 (${response.status}): ${resourceUrl}`);
+                        return null;
+                    }
+                } catch (err) {
+                    console.warn(`❌ 检查资源失败: ${resourceUrl}`, err);
+                    return null;
+                }
+            };
+            
+            // 先尝试直接使用提供的URL
+            this.tilesRenderer = await loadWithErrorHandling(url);
+            
+            // 如果直接URL失败，尝试备用路径
+            if (!this.tilesRenderer) {
+                console.log('直接URL加载失败，尝试其他路径...');
+                
+                // 获取基础路径
+                const basePath = window.location.pathname.includes('/FyraXR/') 
+                    ? '/FyraXR/' 
+                    : '/';
+                
+                // 生成可能的替代路径
+                const alternativePaths = [
+                    // 相对路径
+                    './models/mj/tileset.json',
+                    '../models/mj/tileset.json',
+                    
+                    // 基于当前环境的绝对路径
+                    `${basePath}models/mj/tileset.json`,
+                    
+                    // GitHub Pages特定路径
+                    '/FyraXR/models/mj/tileset.json',
+                ];
+                
+                // 尝试每一个备用路径
+                for (const path of alternativePaths) {
+                    console.log(`尝试备用路径: ${path}`);
+                    this.tilesRenderer = await loadWithErrorHandling(path);
+                    if (this.tilesRenderer) {
+                        console.log(`✅ 成功使用备用路径: ${path}`);
+                        break;
+                    }
+                }
+                
+                if (!this.tilesRenderer) {
+                    throw new Error('所有路径尝试失败');
+                }
+            }
             
             // 设置相机和分辨率
             this.tilesRenderer.setCamera(this.camera);

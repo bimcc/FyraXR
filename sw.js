@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fyraxr-v4'; // 更新版本号
+const CACHE_NAME = 'fyraxr-v5'; // 更新版本号
 
 // 获取当前作用域的基础路径
 const getBasePath = () => {
@@ -16,7 +16,11 @@ self.addEventListener('install', event => {
   // 只缓存静态资源，不缓存HTML
   const urlsToCache = [
     base + 'manifest.json',
-    base + 'icon/icon.png'
+    base + 'icon/icon.png',
+    // 添加构建后的资源文件 - 使用通配符模式
+    base + 'assets/index-*.js',
+    base + 'assets/three-*.js',
+    base + 'assets/3d-tiles-*.js'
     // 移除index.html，让它始终从网络获取
   ];
   
@@ -64,6 +68,36 @@ self.addEventListener('fetch', event => {
               'Content-Type': 'text/html'
             })
           });
+        })
+    );
+    return;
+  }
+  
+  // 特殊处理JS资源，确保找到正确的缓存
+  if (url.pathname.includes('/assets/') && 
+      (url.pathname.includes('.js') || url.pathname.includes('.json') || url.pathname.includes('.png'))) {
+    event.respondWith(
+      // 先尝试网络请求
+      fetch(event.request)
+        .then(response => {
+          // 检查是否收到了有效响应
+          if (response && response.status === 200) {
+            // 复制响应，因为响应是流，只能使用一次
+            var responseToCache = response.clone();
+            
+            // 更新缓存
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+            
+            return response;
+          }
+          // 网络失败，使用缓存
+          return caches.match(event.request);
+        })
+        .catch(() => {
+          // 网络失败，尝试使用缓存
+          return caches.match(event.request);
         })
     );
     return;
